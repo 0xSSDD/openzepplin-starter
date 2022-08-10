@@ -1,24 +1,29 @@
-const {expect} = require('chai');
-const { ethers } = require('hardhat');
+const { ethers, deployments } = require("hardhat");
 
 describe('Box', () => {
-
-  before(async () => {
-    this.Box = await ethers.getContractFactory('Box');
-  })
+  
 
   beforeEach(async () => {
-    this.box = await this.Box.deploy();
-    await this.box.deployed();
+    let box;
+    const accounts = await ethers.getSigners();
+    await deployments.fixture();
+
+    const Box = await deployments.get("Box");
+    box = new ethers.Contract(Box.address, Box.abi, accounts[0])
+    
   })
-  // Test case
+
+  describe('Box tests', async() => {
+    // Test case
   it('retrieve returns a value previously stored', async function () {
     // Store a value
-    await this.box.store(42);
+    await box.store(42);
 
     // Test if the returned value is the same one
     // Note that we need to use strings to compare the 256 bit integers
-    expect((await this.box.retrieve()).toString()).to.equal('42');
+    expect((await box.retrieve()).toString()).to.equal('42');
   });
+  });
+  
 
 });
